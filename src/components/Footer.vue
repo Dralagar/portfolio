@@ -24,7 +24,7 @@
         <div class="footer-section social">
           <h4 class="footer-title">Follow Me</h4>
           <ul class="social-list">
-            <li><a href="#" class="social-link"><i class="fab fa-twitter"></i> Twitter</a></li>
+            <li><a href="#" class="social-link"><i class="fab fa-twitte"></i> Twitter</a></li>
             <li><a href="#" class="social-link"><i class="fab fa-linkedin"></i> LinkedIn</a></li>
             <li><a href="#" class="social-link"><i class="fab fa-github"></i> GitHub</a></li>
             <li><a href="#" class="social-link"><i class="fab fa-instagram"></i> Instagram</a></li>
@@ -208,5 +208,65 @@ export default defineComponent({
     flex-direction: column;
     text-align: center;
   }
+}
+
+.futuristic-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-color: #0a0a0a;
+  color: #fff;
+  text-align: center;
+  gap: 2rem;
+}
+
+.futuristic-container h2 {
+  font-size: 2rem;
+  color: #00e6e6;
+  text-shadow: 0 0 10px #00e6e6, 0 0 20px #00e6e6, 0 0 30px #00e6e6;
+  margin-bottom: 1rem;
+}
+
+.futuristic-container p, .futuristic-container ul {
+  font-size: 1.2rem;
+  line-height: 1.5;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.futuristic-container ul {
+  list-style: none;
+  padding: 0;
+}
+
+.futuristic-container li {
+  margin: 0.5rem 0;
+}
+
+.futuristic-container a {
+  color: #00e6e6;
+  text-decoration: none;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.futuristic-container a:hover {
+  color: #fff;
+  text-shadow: 0 0 5px #00e6e6, 0 0 10px #00e6e6, 0 0 15px #00e6e6;
+}
+
+.social-link {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border: 2px solid #00e6e6;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.social-link:hover {
+  background-color: #00e6e6;
+  color: #0a0a0a;
+  transform: scale(1.1);
 }
 </style>

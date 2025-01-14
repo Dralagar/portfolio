@@ -48,8 +48,10 @@ export default defineComponent({
 .contact-section {
   position: relative;
   padding: 4rem 2rem;
-  background: url('@/assets/images/contact-bg.jpg') no-repeat center center/cover;
-  color: #edf2f7;
+  background-image: url('@/assets/images/contact.jpg');
+  background-size: cover;
+  background-position: center;
+  color: #F5EFE7;
   text-align: center;
 }
 

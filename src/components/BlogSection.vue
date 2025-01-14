@@ -15,7 +15,14 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
-import axios from 'axios';
+import { createClient } from '@sanity/client';
+
+const client = createClient({
+  projectId: 'your-project-id',
+  dataset: 'production',
+  useCdn: true,
+  apiVersion: '2023-10-01'
+});
 
 export default defineComponent({
   name: 'BlogSection',
@@ -24,15 +31,14 @@ export default defineComponent({
 
     const fetchPosts = async () => {
       try {
-        const response = await axios.get('https://your-backend-api.com/api/posts');
-        posts.value = response.data;
+        const sanityPosts = await client.fetch('*[_type == "post"]');
+        posts.value = sanityPosts;
       } catch (error) {
         console.error('Error fetching blog posts:', error);
       }
     };
 
-    const viewPost = (id: number) => {
-      // Implement navigation to the full blog post
+    const viewPost = (id) => {
       console.log(`Viewing post with ID: ${id}`);
     };
 
@@ -48,21 +54,26 @@ export default defineComponent({
 <style scoped>
 .blog-section {
   padding: 4rem 2rem;
-  background-color: #F5EFE7;
-  color: #213555;
+  background: linear-gradient(135deg, #948979, #DFD0B8);
+  color: #153448;
   text-align: center;
+  overflow: hidden;
+  position: relative;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .section-title {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 3rem;
-  color: #3E5879;
+  color: #3C5B6F;
+  text-shadow: 0 0 10px #DFD0B8;
 }
 
 .blog-grid {
@@ -72,15 +83,18 @@ export default defineComponent({
 }
 
 .blog-card {
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.8);
   border-radius: 0.75rem;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
 }
 
 .blog-card:hover {
-  transform: translateY(-10px);
+  transform: translateY(-10px) scale(1.05);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
 
@@ -88,7 +102,8 @@ export default defineComponent({
   font-size: 1.75rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: #D8C4B6;
+  color: #153448;
+  text-shadow: 0 0 5px #DFD0B8;
 }
 
 .blog-excerpt {
@@ -98,17 +113,24 @@ export default defineComponent({
 }
 
 .read-more-button {
-  background-color: #D8C4B6;
-  color: #213555;
+  background-color: #3C5B6F;
+  color: #DFD0B8;
   padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 0.5rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .read-more-button:hover {
-  background-color: #3E5879;
-  color: #F5EFE7;
+  background-color: #153448;
+  color: #DFD0B8;
+  transform: scale(1.1);
+}
+
+@media (min-width: 768px) {
+  .blog-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 </style>

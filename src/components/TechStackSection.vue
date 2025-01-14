@@ -25,7 +25,7 @@ export default defineComponent({
       { name: 'React', image: '/path/to/react-icon.png' },
       { name: 'Node.js', image: '/path/to/nodejs-icon.png' },
       { name: 'Express', image: '/path/to/express-icon.png' },
-      { name: 'MongoDB', image: '/path/to/mongodb-icon.png' },
+      { name: 'MongoDB', image: '/path/to/mongoDB.jpg' },
       { name: 'GraphQL', image: '/path/to/graphql-icon.png' },
       { name: 'HTML5', image: '/path/to/html5-icon.png' },
       { name: 'CSS3', image: '/path/to/css3-icon.png' },
