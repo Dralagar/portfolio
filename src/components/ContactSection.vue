@@ -1,5 +1,5 @@
 <template>
-  <section id="contact" class="contact-section">
+  <section class="contact-section" ref="contactSection">
     <div class="overlay">
       <div class="container">
         <h3 class="section-title">Contact Me</h3>
@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive } from 'vue';
+import { defineComponent, reactive, onMounted, ref } from 'vue';
 import emailjs from 'emailjs-com';
 
 export default defineComponent({
@@ -27,6 +27,8 @@ export default defineComponent({
       email: '',
       message: ''
     });
+
+    const contactSection = ref<HTMLElement | null>(null);
 
     const sendEmail = () => {
       emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', form, 'YOUR_USER_ID')
@@ -39,7 +41,23 @@ export default defineComponent({
         });
     };
 
-    return { form, sendEmail };
+    const handleScroll = () => {
+      if (contactSection.value) {
+        const rect = contactSection.value.getBoundingClientRect();
+        if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
+          contactSection.value.classList.add('animate-spin');
+          setTimeout(() => {
+            contactSection.value?.classList.remove('animate-spin');
+          }, 1000); // Animation duration
+        }
+      }
+    };
+
+    onMounted(() => {
+      window.addEventListener('scroll', handleScroll);
+    });
+
+    return { form, sendEmail, contactSection };
   }
 });
 </script>
@@ -48,17 +66,38 @@ export default defineComponent({
 .contact-section {
   position: relative;
   padding: 4rem 2rem;
-  background-image: url('@/assets/images/contact.jpg');
-  background-size: cover;
+  background-image: url('@/assets/images/contact.png');
+  background-size: contain;
+  background-repeat: no-repeat;
   background-position: center;
   color: #F5EFE7;
   text-align: center;
+  min-height: 100vh;
+  transition: transform 0.5s ease-in-out;
+}
+
+.animate-spin {
+  animation: spin 0.5s ease-in-out;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .overlay {
   background-color: rgba(0, 0, 0, 0.6);
   padding: 2rem;
   border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 
 .container {

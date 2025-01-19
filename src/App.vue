@@ -2,14 +2,14 @@
   <div :class="['app-container', { 'dark-mode': isDarkMode }]">
     <Header @toggleDarkMode="toggleDarkMode" />
     <main class="main-content">
-      <HeroSection />
-      <AboutSection />
-      <TechStackSection />
-      <ProjectsSection />
-      <PodcastSection />
-      <BlogSection />
-      <TestimonialSection />
-      <ContactSection />  
+      <HeroSection id="hero" />
+      <AboutSection id="about" />
+      <TechStackSection id="tech-stack" />
+      <ProjectsSection id="projects" />
+      <PodcastSection id="podcast" />
+      <BlogSection id="blog" />
+      <TestimonialSection id="testimonials" />
+      <ContactSection id="contact" />
     </main>
     <Footer />
   </div>
@@ -27,6 +27,8 @@ import BlogSection from './components/BlogSection.vue';
 import TestimonialSection from './components/TestimonialSection.vue';
 import Footer from './components/Footer.vue';
 import ContactSection from './components/ContactSection.vue';
+import javascriptIcon from '@/assets/images/javascript-icon.png';
+
 export default defineComponent({
   name: 'App',
   components: {

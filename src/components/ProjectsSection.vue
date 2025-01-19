@@ -4,7 +4,11 @@
       <h3 class="section-title">Projects</h3>
       <div class="projects-grid">
         <div v-for="project in projects" :key="project.id" class="project-card">
-          <img :src="getImagePath(project.image)" :alt="project.title" class="project-image" />
+          <img 
+            :src="getImagePath(project.image)" 
+            :alt="project.title" 
+            class="project-image" 
+          />
           <div class="project-content">
             <h4 class="project-title">{{ project.title }}</h4>
             <p class="project-description">{{ project.description }}</p>
@@ -24,18 +28,18 @@ export default defineComponent({
   setup() {
     const projects = ref([
       { id: 1, title: 'Mellaundry', description: 'A brief description of the project.', image: 'lm.jpg' },
-      { id: 2, title: 'Pamoja Twaweza', description: 'A brief description of the project.', image: 'project2.jpg' },
+      { id: 2, title: 'Pamoja Twaweza', description: 'A brief description of the project.', image: 'pamojaTwaweza.png' },
       { id: 3, title: 'Refugee Brotherhood', description: 'A brief description of the project.', image: 'project3.jpg' },
-      { id: 4, title: 'Revuze', description: 'A brief description of the project.', image: 'project4.jpg' },
-      { id: 5, title: 'NFT Store', description: 'A brief description of the project.', image: 'project5.jpg' },
+      { id: 4, title: 'Revuze', description: 'A brief description of the project.', image: 'revuze.png' },
+      { id: 5, title: 'NFT Store', description: 'A brief description of the project.', image: 'nft.jpg' },
       { id: 6, title: 'Project 6', description: 'A brief description of the project.', image: 'project6.jpg' },
       // Add more projects as needed
     ]);
 
-    const images = import.meta.glob('/src/assets/images/*.jpg', { eager: true });
+    const images = import.meta.glob('/src/assets/images/*.{jpg,png}', { eager: true, as: 'url' });
 
     const getImagePath = (imageName: string) => {
-      return images[`/src/assets/images/${imageName}`]?.default || '';
+      return images[`/src/assets/images/${imageName}`] || '';  
     };
 
     const viewProject = (id: number) => {

@@ -1,22 +1,31 @@
 <template>
   <header class="header">
-    <div class="container">
-      <a href="/" class="logo">
-        <img src="@/assets/images/ReactNowDevLogo.png" alt="My Portfolio Logo" class="logo-image" />
-      </a>
-      <nav class="navbar">
-        <div class="hamburger" @click="toggleMenu">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <ul :class="{ 'nav-list': true, 'active': isMenuActive }">
+    <div class="container flex justify-between items-center py-4 px-4 lg:px-8">
+      <!-- Logo -->
+      <div class="logo flex-shrink-0">
+        <a href="">
+          <img src="@/assets/images/ReactNowDevLogo.png" alt="Logo" class="h-12 md:h-16">
+        </a>
+      </div>
+      <!-- Navigation -->
+      <nav class="flex items-center">
+        <!-- Hamburger menu -->
+        <button
+          @click="toggleMenu"
+          class="hamburger-menu focus:outline-none md:hidden"
+          aria-label="Toggle Navigation"
+        >
+          <span :class="['hamburger-line', { 'active': isMenuOpen }]" />
+          <span :class="['hamburger-line', { 'active': isMenuOpen }]" />
+          <span :class="['hamburger-line', { 'active': isMenuOpen }]" />
+        </button>
+        <!-- Navigation Links -->
+        <ul :class="['nav-links', { 'open': isMenuOpen }]">
           <li><a href="#about" class="nav-link">About</a></li>
           <li><a href="#projects" class="nav-link">Projects</a></li>
-          <li><a href="#contact" class="nav-link">Contact</a></li>
+          <li><a href="#podcasts" class="nav-link">Podcasts</a></li>
           <li><a href="#blog" class="nav-link">Blog</a></li>
-          <li><a href="#testimonial" class="nav-link">Testimonial</a></li>  
-          <li><a href="#podcast" class="nav-link">Podcast</a></li>
+          <li><a href="#contact" class="nav-link">Contact</a></li>
         </ul>
       </nav>
     </div>
@@ -24,155 +33,132 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref } from "vue";
 
 export default defineComponent({
-  name: 'Header',
+  name: "HeaderSection",
   setup() {
-    const isMenuActive = ref(false);
+    const isMenuOpen = ref(false);
 
     const toggleMenu = () => {
-      isMenuActive.value = !isMenuActive.value;
+      isMenuOpen.value = !isMenuOpen.value;
     };
 
-    return { isMenuActive, toggleMenu };
-  }
+    return { isMenuOpen, toggleMenu };
+  },
 });
 </script>
 
 <style scoped>
-/* Header Styles */
 .header {
-  background-color: #153448;
-  color: #DFD0B8;
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: fixed;
+  position: sticky;
   top: 0;
+  z-index: 50;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease-in-out;
   width: 100%;
-  z-index: 1000;
   margin-bottom: 0;
 }
 
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-/* Logo */
-.logo {
-  display: flex;
-  align-items: center;
-}
-
-.logo-image {
-  height: 70px;
-  width: auto;
-  transition: transform 0.3s ease;
-}
-
-.logo-image:hover {
-  transform: scale(1.1);
-}
-
-/* Contact Button */
-.contact-button {
-  display: none;
-  background-color: #3C5B6F;
-  color: #F5EFE7;
-  border: none;
   padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-bottom: 0;
 }
 
-.contact-button:hover {
-  background-color: #DFD0B8;
-  transform: scale(1.05);
+.logo img {
+  height: 70px;
+  max-height: 100%;
 }
 
-/* Hamburger Menu */
-.hamburger {
+.hamburger-menu {
   display: flex;
   flex-direction: column;
-  cursor: pointer;
-  gap: 0.3rem;
-  background: none;
+  justify-content: space-around;
+  width: 30px;
+  height: 24px;
+  background: transparent;
   border: none;
+  cursor: pointer;
+  z-index: 20;
 }
 
-.hamburger span {
-  width: 25px;
+.hamburger-line {
+  width: 100%;
   height: 3px;
-  background-color: #DFD0B8;
-  transition: all 0.3s ease;
+  background-color: #333;
+  border-radius: 2px;
+  transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
-.nav-menu {
-  display: none;
-  position: absolute;
-  top: 60px;
-  right: 0;
-  background-color: #3E5879;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.hamburger-line.active:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
 }
 
-.nav-menu.active {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.hamburger-line.active:nth-child(2) {
+  opacity: 0;
 }
 
-.nav-list {
-  display: none;
+.hamburger-line.active:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+.nav-links {
   list-style: none;
-  background-color: #3E5879;
-  padding: 1rem;
-  border-radius: 0.5rem;
+  padding: 0;
+  margin: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
   position: absolute;
-  top: 3rem;
+  top: 100%;
+  left: 0;
   right: 0;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  text-align: right;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  transition: max-height 0.3s ease-in-out;
+  overflow: hidden;
+  max-height: 0;
 }
 
-.nav-list.active {
-  display: block;
+.nav-links.open {
+  display: flex;
+  max-height: 500px;
 }
 
 .nav-link {
-  color: #DFD0B8;
+  padding: 0.75rem 1rem;
+  text-transform: capitalize;
+  color: #333;
   text-decoration: none;
-  display: block;
-  padding: 0.5rem 0;
-  transition: color 0.3s ease;
   font-weight: 500;
+  transition: color 0.3s ease;
 }
 
 .nav-link:hover {
-  color: #F5EFE7;
+  color: #007bff;
 }
 
-/* Larger Screens */
 @media (min-width: 768px) {
-  .nav-list {
-    display: flex;
-    position: static;
-    background-color: transparent;
-    flex-direction: row;
-    gap: 1.5rem;
-    justify-content: flex-end;
+  .hamburger-menu {
+    display: none;
   }
 
-  .hamburger {
-    display: none;
+  .nav-links {
+    display: flex;
+    flex-direction: row;
+    position: static;
+    box-shadow: none;
+    max-height: none;
+  }
+
+  .nav-link {
+    padding: 0;
+    margin: 0 1rem;
   }
 }
 </style>

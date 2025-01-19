@@ -27,11 +27,14 @@
 
     <style scoped>
     .about-section {
-        padding: 4rem 2rem;
-        background-color: #DFD0B8;
-        color: #153448;
-        text-align: center;
-        margin-top: 80px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 3rem 1.5rem 0;
+        background-color: #F5EFE7;
+        color: #213555;
+        margin: 0;
     }
 
     .container {

@@ -2,30 +2,37 @@
   <section class="hero-section">
     <div class="hero-content">
       <div class="text-content">
-        <h1 class="hero-title">Hello, I'm Dralagar George!</h1>
+        <h1 class="hero-title">
+          Hello! 
+          <img src="@/assets/images/hello.jpg" alt="Hello Icon" class="hello-icon" />
+          <br />
+          I'm Dralagar George.
+        </h1>
         <h2 class="hero-subtitle">Web Developer & Digital Services Consultant</h2>
-        <p class="hero-description">Explore my projects and skills, and let’s create something amazing together.</p>
+        <p class="hero-description">
+          Explore my projects and skills, and let’s create something amazing together.
+        </p>
         <button @click="scrollToProjects" class="hero-cta-button" aria-label="View Projects">
           View Projects
         </button>
       </div>
       <div class="visual-content">
-        <img src="@/assets/images/geo.jpg" alt="Dralagar George, Web Developer" class="hero-image" />
+        <img src="@/assets/images/Geo.png" alt="Dralagar George, Web Developer" class="hero-image" />
       </div>
     </div>
   </section>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: "HeroSection",
+  name: 'HeroSection',
   methods: {
     scrollToProjects() {
-      const projectsSection = document.getElementById("projects");
+      const projectsSection = document.getElementById('projects');
       if (projectsSection) {
-        projectsSection.scrollIntoView({ behavior: "smooth" });
+        projectsSection.scrollIntoView({ behavior: 'smooth' });
       }
     },
   },
@@ -38,10 +45,10 @@ export default defineComponent({
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 2rem 1rem;
-  background-color: #3C5B6F;
-  color: #DFD0B8;
-  height: 100vh;
+  padding: 2rem 1.5rem;
+  background-color: #3C5B6F; /* Primary background color */
+  color: #DFD0B8; /* Text color */
+  min-height: calc(100vh - 80px);
   text-align: center;
 }
 
@@ -49,108 +56,88 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
-  max-width: 90%;
+  gap: 2rem;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
 .text-content {
-  max-width: 600px;
+  flex: 1;
 }
 
 .hero-title {
   font-size: 2rem;
-  font-weight: bold;
+  font-weight: 700;
+  line-height: 1.2;
   margin-bottom: 1rem;
-  color: #DFD0B8;
-  text-shadow: 0 0 10px #153448;
+  color: #f5efe7;
+}
+
+.hello-icon {
+  width: 50px;
+  vertical-align: middle;
 }
 
 .hero-subtitle {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   margin-bottom: 1rem;
-  color: #DFD0B8;
 }
 
 .hero-description {
-  font-size: 0.9rem;
-  margin-bottom: 1.5rem;
-  line-height: 1.5;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  line-height: 1.6;
 }
 
 .hero-cta-button {
   background-color: #213555;
-  color: #F5EFE7;
-  padding: 0.5rem 1.5rem;
-  border: none;
-  border-radius: 0.5rem;
+  color: #f5efe7;
+  padding: 0.75rem 2rem;
   font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-weight: bold;
+  border-radius: 8px;
+  transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
 .hero-cta-button:hover {
-  background-color: #D8C4B6;
+  background-color: #d8c4b6;
+  color: #213555;
   transform: scale(1.05);
 }
 
-.visual-content {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.hero-image {
-  max-width: 80%;
+.visual-content img {
+  max-width: 100%;
   height: auto;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
 }
 
 @media (min-width: 768px) {
   .hero-content {
     flex-direction: row;
-    justify-content: space-between;
-    gap: 3rem;
-  }
-
-  .text-content {
-    max-width: 50%;
     text-align: left;
   }
 
+  .text-content {
+    flex: 1;
+  }
+
   .visual-content {
-    max-width: 50%;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
-  .hero-title {
-    font-size: 2.5rem;
-  }
-
-  .hero-subtitle {
-    font-size: 1.5rem;
-  }
-
-  .hero-description {
-    font-size: 1rem;
-  }
-}
-
-@media (min-width: 1200px) {
   .hero-title {
     font-size: 3rem;
   }
 
   .hero-subtitle {
-    font-size: 1.75rem;
+    font-size: 2rem;
   }
 
   .hero-description {
-    font-size: 1.1rem;
-  }
-
-  .hero-cta-button {
-    padding: 0.75rem 2rem;
+    font-size: 1.25rem;
   }
 }
 </style>
