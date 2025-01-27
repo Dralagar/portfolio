@@ -1,31 +1,28 @@
 <template>
-  <section id="projects" class="projects-section">
-    <div class="container">
-      <h3 class="section-title">Projects</h3>
-      <div class="projects-grid">
-        <div v-for="project in projects" :key="project.id" class="project-card">
-          <img 
-            :src="getImagePath(project.image)" 
-            :alt="project.title" 
-            class="project-image" 
-          />
-          <div class="project-content">
-            <h4 class="project-title">{{ project.title }}</h4>
-            <p class="project-description">{{ project.description }}</p>
-            <button @click="viewProject(project.id)" class="view-button">View Details</button>
-          </div>
-        </div>
+  <div class="projects-section">
+    <h2>Projects</h2>
+    <div class="project-list">
+      <div
+        v-for="project in projects"
+        :key="project.id"
+        class="project-card"
+        @click="() => viewProject(project.id)"
+      >
+        <img :src="getImagePath(project.image)" alt="Project image" />
+        <h3>{{ project.title }}</h3>
+        <p>{{ project.description }}</p>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, reactive } from 'vue';
 
 export default defineComponent({
   name: 'ProjectsSection',
   setup() {
+    // Define the list of projects
     const projects = ref([
       { id: 1, title: 'Mellaundry', description: 'A brief description of the project.', image: 'lm.jpg' },
       { id: 2, title: 'Pamoja Twaweza', description: 'A brief description of the project.', image: 'pamojaTwaweza.png' },
@@ -33,113 +30,79 @@ export default defineComponent({
       { id: 4, title: 'Revuze', description: 'A brief description of the project.', image: 'revuze.png' },
       { id: 5, title: 'NFT Store', description: 'A brief description of the project.', image: 'nft.jpg' },
       { id: 6, title: 'Project 6', description: 'A brief description of the project.', image: 'project6.jpg' },
-      // Add more projects as needed
     ]);
 
-    const images = import.meta.glob('/src/assets/images/*.{jpg,png}', { eager: true, as: 'url' });
+    // Define 'images' as a reactive object to store dynamically imported images
+    const images = reactive<Record<string, string>>({});
 
-    const getImagePath = (imageName: string) => {
-      return images[`/src/assets/images/${imageName}`] || '';  
+    // Function to dynamically import images from the assets folder
+    const importImages = async () => {
+      const imageContext = (require as any).context('../assets/images', false, /\.(jpg|png)$/);
+      imageContext.keys().forEach((key: string) => {
+        const name = key.split('/').pop() || '';
+        if (name) {
+          images[name] = imageContext(key).default;
+        }
+      });
+    };
+    // Call importImages to load images when the component is set up
+    importImages();
+
+    // Function to get the image path from the 'images' object
+    const getImagePath = (imageName: string): string => {
+      return images[imageName] || ''; // Return the image path or an empty string if not found
     };
 
-    const viewProject = (id: number) => {
+    // Function to handle viewing a project
+    const viewProject = (id: number): void => {
       console.log(`Viewing project with ID: ${id}`);
-      // Implement project detail view logic here
     };
 
+    // Return the properties to be used in the template
     return { projects, getImagePath, viewProject };
-  }
+  },
 });
 </script>
 
 <style scoped>
 .projects-section {
-  padding: 4rem 2rem;
-  background-color: #F5EFE7;
-  color: #2d3748;
-  text-align: center;
+  padding: 20px;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.section-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 3rem;
-  color: #213555;
-}
-
-.projects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
+.project-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .project-card {
-  background-color: #fff;
-  border-radius: 0.75rem;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  width: 250px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  animation: fadeInUp 0.5s ease forwards;
-  opacity: 0;
+  cursor: pointer;
+  transition: transform 0.3s ease;
 }
 
 .project-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
 }
 
-.project-image {
+.project-card img {
   width: 100%;
-  height: 200px;
+  height: 150px;
   object-fit: cover;
 }
 
-.project-content {
-  padding: 1.5rem;
+.project-card h3 {
+  margin: 10px 0;
+  font-size: 1.2rem;
+  text-align: center;
 }
 
-.project-title {
-  font-size: 1.75rem;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-  color: #3E5879;
-}
-
-.project-description {
-  font-size: 1rem;
-  margin-bottom: 1.5rem;
-  color: #4a5568;
-}
-
-.view-button {
-  background-color: #D8C4B6;
-  color: #213555;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.view-button:hover {
-  background-color: #3E5879;
-  color: #F5EFE7;
-  transform: translateY(-2px);
-}
-
-@keyframes fadeInUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+.project-card p {
+  padding: 0 10px;
+  font-size: 0.9rem;
+  text-align: center;
 }
 </style>

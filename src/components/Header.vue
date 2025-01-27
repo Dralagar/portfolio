@@ -3,8 +3,8 @@
     <div class="container flex justify-between items-center py-4 px-4 lg:px-8">
       <!-- Logo -->
       <div class="logo flex-shrink-0">
-        <a href="">
-          <img src="@/assets/images/ReactNowDevLogo.png" alt="Logo" class="h-12 md:h-16">
+        <a href="#">
+          <img src="@/assets/images/ReactNowDevLogo.png" alt="Logo" class="h-12 md:h-16" />
         </a>
       </div>
       <!-- Navigation -->
@@ -21,11 +21,11 @@
         </button>
         <!-- Navigation Links -->
         <ul :class="['nav-links', { 'open': isMenuOpen }]">
-          <li><a href="#about" class="nav-link">About</a></li>
-          <li><a href="#projects" class="nav-link">Projects</a></li>
-          <li><a href="#podcasts" class="nav-link">Podcasts</a></li>
-          <li><a href="#blog" class="nav-link">Blog</a></li>
-          <li><a href="#contact" class="nav-link">Contact</a></li>
+          <li><a href="#about" class="nav-link" @click="navigateAndClose">About</a></li>
+          <li><a href="#projects" class="nav-link" @click="navigateAndClose">Projects</a></li>
+          <li><a href="#podcasts" class="nav-link" @click="navigateAndClose">Podcasts</a></li>
+          <li><a href="#blog" class="nav-link" @click="navigateAndClose">Blog</a></li>
+          <li><a href="#contact" class="nav-link" @click="navigateAndClose">Contact</a></li>
         </ul>
       </nav>
     </div>
@@ -40,11 +40,17 @@ export default defineComponent({
   setup() {
     const isMenuOpen = ref(false);
 
+    // Toggle menu function
     const toggleMenu = () => {
       isMenuOpen.value = !isMenuOpen.value;
     };
 
-    return { isMenuOpen, toggleMenu };
+    // Close menu after navigation
+    const navigateAndClose = () => {
+      isMenuOpen.value = false; // Close the menu when a link is clicked
+    };
+
+    return { isMenuOpen, toggleMenu, navigateAndClose };
   },
 });
 </script>
@@ -66,7 +72,6 @@ export default defineComponent({
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 1rem;
-  margin-bottom: 0;
 }
 
 .logo img {
@@ -120,7 +125,7 @@ export default defineComponent({
   background-color: #ffffff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   z-index: 10;
-  transition: max-height 0.3s ease-in-out;
+  transition: max-height 0.3s ease-in-out, transform 0.3s ease-in-out;
   overflow: hidden;
   max-height: 0;
 }
@@ -128,6 +133,7 @@ export default defineComponent({
 .nav-links.open {
   display: flex;
   max-height: 500px;
+  transform: translateY(0);
 }
 
 .nav-link {
@@ -154,6 +160,7 @@ export default defineComponent({
     position: static;
     box-shadow: none;
     max-height: none;
+    transform: none;
   }
 
   .nav-link {

@@ -10,7 +10,7 @@
         </h1>
         <h2 class="hero-subtitle">Web Developer & Digital Services Consultant</h2>
         <p class="hero-description">
-          Explore my projects and skills, and let’s create something amazing together.
+          Explore my projects and skills, and let's create something amazing together.
         </p>
         <button @click="scrollToProjects" class="hero-cta-button" aria-label="View Projects">
           View Projects
@@ -50,6 +50,8 @@ export default defineComponent({
   color: #DFD0B8; /* Text color */
   min-height: calc(100vh - 80px);
   text-align: center;
+  margin-top: 0;
+  padding-top: 0;
 }
 
 .hero-content {
@@ -136,6 +138,7 @@ export default defineComponent({
     font-size: 2rem;
   }
 
+  
   .hero-description {
     font-size: 1.25rem;
   }
