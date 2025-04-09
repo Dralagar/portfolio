@@ -9,11 +9,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-brands-svg-icons": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/vue-fontawesome": "^3.0.8",
+    "@heroicons/vue": "^2.2.0",
     "@sanity/client": "^6.24.3",
+    "aos": "^2.3.4",
     "axios": "^1.7.9",
     "emailjs-com": "^3.2.0",
+    "html2pdf.js": "^0.10.3",
     "typescript": "^5.7.3",
     "vue": "^3.5.13",
+    "vue-progressbar": "^0.7.5",
+    "vue-router": "^4.5.0",
+    "vue-typed-js": "^0.1.2",
     "vuex": "^4.0.2"
   },
   "devDependencies": {

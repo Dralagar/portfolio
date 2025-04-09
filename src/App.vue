@@ -2,14 +2,11 @@
   <div :class="['app-container', { 'dark-mode': isDarkMode }]">
     <Header @toggleDarkMode="toggleDarkMode" />
     <main class="main-content">
-      <HeroSection id="hero" />
-      <AboutSection id="about" />
-      <TechStackSection id="tech-stack" />
-      <ProjectsSection id="projects" />
-      <PodcastSection id="podcast" />
-      <BlogSection id="blog" />
-      <TestimonialSection id="testimonials" />
-      <ContactSection id="contact" />
+      <router-view v-slot="{ Component }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </main>
     <Footer />
   </div>
@@ -18,30 +15,13 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import Header from './components/Header.vue';
-import HeroSection from './components/HeroSection.vue';
-import AboutSection from './components/AboutSection.vue';
-import TechStackSection from './components/TechStackSection.vue';
-import ProjectsSection from './components/ProjectsSection.vue';
-import PodcastSection from './components/PodcastSection.vue';
-import BlogSection from './components/BlogSection.vue';
-import TestimonialSection from './components/TestimonialSection.vue';
 import Footer from './components/Footer.vue';
-import ContactSection from './components/ContactSection.vue';
-import javascriptIcon from '@/assets/images/javascript-icon.png';
 
 export default defineComponent({
   name: 'App',
   components: {
     Header,
-    HeroSection,
-    AboutSection,
-    TechStackSection,
-    ProjectsSection,
-    PodcastSection,
-    BlogSection,
-    TestimonialSection,
-    Footer,
-    ContactSection
+    Footer
   },
   setup() {
     const isDarkMode = ref(false);
@@ -64,6 +44,7 @@ export default defineComponent({
   --text-color: #333;
   --header-height: 80px;
   --footer-height: 60px;
+  --gradient-bg: linear-gradient(135deg, #213555, #3E5879);
 }
 
 .dark-mode {
@@ -93,8 +74,18 @@ body {
   padding-top: var(--header-height);
   padding-bottom: var(--footer-height);
   overflow-y: auto;
-  background-color: var(--background-color);
+  background: var(--gradient-bg);
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 
 a {
