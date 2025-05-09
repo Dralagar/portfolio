@@ -10,11 +10,13 @@
         <div class="podcast-block featured-episode">
           <div class="episode-badge">Latest Episode</div>
           <div class="video-container">
-            <video 
+            <video
               controls 
               class="podcast-video"
               :poster="thumbnailUrl"
               @play="trackEngagement('video')"
+              
+              @timeupdate="handleTimeUpdate"
             >
               <source :src="videoSrc" type="video/mp4" />
               Your browser does not support the video tag.
@@ -25,7 +27,7 @@
               </button>
             </div>
           </div>
-          <div class="episode-info">
+          <div v-if="currentEpisode" class="episode-info">
             <h3 class="episode-title">{{ currentEpisode.title }}</h3>
             <p class="episode-description">{{ currentEpisode.description }}</p>
             <div class="episode-meta">
@@ -33,60 +35,63 @@
               <span><font-awesome-icon icon="calendar" /> {{ currentEpisode.date }}</span>
             </div>
           </div>
+          <div v-else class="episode-info">
+            <p>No episode information available.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="podcast-content">
+        <div class="podcast-tabs">
+          <button 
+            v-for="tab in tabs" 
+            :key="tab.id"
+            :class="['tab-btn', { active: activeTab === tab.id }]"
+            @click="activeTab = tab.id"
+          >
+            {{ tab.name }}
+          </button>
         </div>
 
-        <div class="podcast-content">
-          <div class="podcast-tabs">
-            <button 
-              v-for="tab in tabs" 
-              :key="tab.id"
-              :class="['tab-btn', { active: activeTab === tab.id }]"
-              @click="activeTab = tab.id"
+        <div class="tab-content">
+          <!-- Audio Episodes List -->
+          <div v-if="activeTab === 'audio'" class="episodes-list">
+            <div 
+              v-for="episode in audioEpisodes" 
+              :key="episode._id"
+              class="episode-card"
+              :class="{ 'playing': currentlyPlaying === episode._id }"
             >
-              {{ tab.name }}
-            </button>
-          </div>
-
-          <div class="tab-content">
-            <!-- Audio Episodes List -->
-            <div v-if="activeTab === 'audio'" class="episodes-list">
-              <div 
-                v-for="episode in audioEpisodes" 
-                :key="episode.id"
-                class="episode-card"
-                :class="{ 'playing': currentlyPlaying === episode.id }"
-              >
-                <div class="episode-thumbnail">
-                  <img :src="episode.thumbnail" :alt="episode.title">
-                  <button class="mini-play-btn" @click="playAudio(episode)">
-                    <font-awesome-icon :icon="currentlyPlaying === episode.id ? 'pause' : 'play'" />
-                  </button>
-                </div>
-                <div class="episode-details">
-                  <h4>{{ episode.title }}</h4>
-                  <p>{{ episode.description }}</p>
-                  <div class="episode-tags">
-                    <span v-for="tag in episode.tags" :key="tag" class="tag">
-                      #{{ tag }}
-                    </span>
-                  </div>
+              <div class="episode-thumbnail">
+                <img :src="episode.thumbnail" :alt="episode.title">
+                <button class="mini-play-btn" @click="playAudio(episode)">
+                  <font-awesome-icon :icon="currentlyPlaying === episode._id ? 'pause' : 'play'" />
+                </button>
+              </div>
+              <div class="episode-details">
+                <h4>{{ episode.title }}</h4>
+                <p>{{ episode.description }}</p>
+                <div class="episode-tags">
+                  <span v-for="tag in episode.tags" :key="tag" class="tag">
+                    #{{ tag }}
+                  </span>
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- Platforms List -->
-            <div v-if="activeTab === 'platforms'" class="platforms-grid">
-              <a 
-                v-for="platform in platforms" 
-                :key="platform.name"
-                :href="platform.link"
-                class="platform-card"
-                target="_blank"
-              >
-                <img :src="platform.icon" :alt="platform.name">
-                <span>{{ platform.name }}</span>
-              </a>
-            </div>
+          <!-- Platforms List -->
+          <div v-if="activeTab === 'platforms'" class="platforms-grid">
+            <a 
+              v-for="platform in platforms" 
+              :key="platform.name"
+              :href="platform.link"
+              class="platform-card"
+              target="_blank"
+            >
+              <img :src="platform.icon" :alt="platform.name">
+              <span>{{ platform.name }}</span>
+            </a>
           </div>
         </div>
       </div>
@@ -124,72 +129,188 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue'
+import { sanityClient } from '@/lib/sanity'
+
+interface PodcastEpisode {
+  _id: string;
+  title: string;
+  description: string;
+  videoUrl?: string;
+  audioUrl?: string;
+  thumbnail?: string;
+  duration: string;
+  date: string;
+  tags: string[];
+  _createdAt: string;
+}
+
+interface Platform {
+  name: string;
+  icon: string;
+  link: string;
+}
+
+interface SocialLink {
+  platform: string;
+  icon: string;
+  link: string;
+}
+
+interface PodcastStats {
+  episodes: number;
+  listeners: number;
+  countries: number;
+}
 
 export default defineComponent({
   name: 'PodcastSection',
   setup() {
     const videoSrc = ref<string>('');
     const activeTab = ref('audio');
-    const currentlyPlaying = ref<number | null>(null);
+    const currentlyPlaying = ref<string | null>(null);
     const thumbnailUrl = ref('path/to/default-thumbnail.jpg');
+    const isLoading = ref(false);
+    const error = ref<string | null>(null);
 
-    const currentEpisode = ref({
-      title: 'The Future of Web Development',
-      description: 'Exploring emerging trends and technologies shaping the web development landscape',
-      duration: '45:00',
-      date: 'Mar 15, 2024'
-    });
+    const currentEpisode = ref<PodcastEpisode | null>(null);
+    const audioEpisodes = ref<PodcastEpisode[]>([]);
 
     const tabs = [
       { id: 'audio', name: 'Episodes' },
+      { id: 'video', name: 'Videos' },
       { id: 'platforms', name: 'Listen On' }
     ];
 
-    const audioEpisodes = ref([
-      {
-        id: 1,
-        title: 'Innovation in Tech',
-        description: 'Discussing breakthrough technologies and their impact',
-        thumbnail: 'path/to/thumbnail1.jpg',
-        tags: ['tech', 'innovation', 'future']
-      },
-      // Add more episodes
-    ]);
-
-    const platforms = ref([
+    const platforms = ref<Platform[]>([
       { name: 'Spotify', icon: 'spotify-icon.png', link: '#' },
       { name: 'Apple Podcasts', icon: 'apple-podcasts-icon.png', link: '#' },
-      // Add more platforms
+      { name: 'Google Podcasts', icon: 'google-podcasts-icon.png', link: '#' },
+      { name: 'Amazon Music', icon: 'amazon-music-icon.png', link: '#' }
     ]);
 
-    const stats = ref({
+    const stats = ref<PodcastStats>({
       episodes: 50,
       listeners: 10,
       countries: 25
     });
 
-    const socials = [
+    const socials: SocialLink[] = [
       { platform: 'twitter', icon: 'twitter', link: '#' },
       { platform: 'linkedin', icon: 'linkedin', link: '#' },
       { platform: 'youtube', icon: 'youtube', link: '#' },
       { platform: 'instagram', icon: 'instagram', link: '#' }
     ];
 
-    const playVideo = () => {
-      const video = document.querySelector('.podcast-video') as HTMLVideoElement;
-      if (video) {
-        video.play();
+    // Engagement state
+    const upvotes = ref<Record<string, number>>({}); // episodeId -> upvotes
+    const userStreak = ref<number>(0);
+    const userTokens = ref<number>(0);
+
+    // Power algorithm: called on every play/view
+    function handleEngagement(episodeId: string) {
+      // 1. Upvote (tokenize)
+      upvotes.value[episodeId] = (upvotes.value[episodeId] || 0) + 1;
+      userTokens.value += 1; // 1 token per upvote/view
+
+      // 2. Streaks
+      userStreak.value += 1;
+
+      // 3. Smart prompt: every 5th episode, show a reward modal
+      const showRewardModal = ref(false);
+      if (userStreak.value % 5 === 0) {
+        showRewardModal.value = true;
+      }
+
+      // 4. Social proof: update trending
+      // (already handled by computed)
+    }
+
+    // Smart prompt: after 70% of episode, nudge to share/upvote
+    const onEpisodeProgress = (percent: number) => {
+      const prompted = ref(false);
+      const showSmartPrompt = ref(false);
+
+      if (percent > 0.7 && !prompted.value) {
+        showSmartPrompt.value = true;
+        prompted.value = true;
       }
     };
 
-    const playAudio = (episode: any) => {
-      currentlyPlaying.value = currentlyPlaying.value === episode.id ? null : episode.id;
+    const handleTimeUpdate = (e: Event) => {
+      const video = e.target as HTMLVideoElement;
+      if (currentEpisode.value?._id) {
+        onEpisodeProgress(video.currentTime / video.duration);
+      }
     };
 
-    const trackEngagement = (type: string) => {
-      // Add analytics tracking here
-      console.log(`Tracking ${type} engagement`);
+    const fetchEpisodes = async () => {
+      try {
+        isLoading.value = true;
+        error.value = null;
+        
+        const query = `*[_type == "podcast"] | order(_createdAt desc) {
+          _id,
+          title,
+          description,
+          videoUrl,
+          audioUrl,
+          thumbnail,
+          duration,
+          date,
+          tags,
+          _createdAt
+        }`;
+        
+        const episodes = await sanityClient.fetch<PodcastEpisode[]>(query);
+        
+        if (episodes && episodes.length > 0) {
+          audioEpisodes.value = episodes;
+          currentEpisode.value = episodes[0];
+          if (currentEpisode.value) {
+            videoSrc.value = currentEpisode.value.videoUrl || '';
+            thumbnailUrl.value = currentEpisode.value.thumbnail || 'path/to/default-thumbnail.jpg';
+          }
+        }
+      } catch (err) {
+        error.value = 'Failed to load podcast episodes. Please try again later.';
+        console.error('Error fetching episodes:', err);
+      } finally {
+        isLoading.value = false;
+      }
+    };
+
+    onMounted(() => {
+      fetchEpisodes();
+    });
+
+    const playVideo = () => {
+      const video = document.querySelector('.podcast-video') as HTMLVideoElement;
+      if (video) {
+        video.play().catch(err => {
+          console.error('Error playing video:', err);
+          error.value = 'Failed to play video. Please try again.';
+        });
+      }
+    };
+
+    const playAudio = (episode: PodcastEpisode) => {
+      try {
+        currentlyPlaying.value = currentlyPlaying.value === episode._id ? null : episode._id;
+        trackEngagement('audio', episode._id);
+      } catch (err) {
+        console.error('Error playing audio:', err);
+        error.value = 'Failed to play audio. Please try again.';
+      }
+    };
+
+    const trackEngagement = (type: string, id?: string) => {
+      // Implement proper analytics tracking
+      console.log(`Tracking ${type} engagement${id ? ` for episode ${id}` : ''}`);
+      if (id) {
+        handleEngagement(id);
+      }
+      // Add your analytics implementation here
     };
 
     return {
@@ -203,9 +324,13 @@ export default defineComponent({
       platforms,
       stats,
       socials,
+      isLoading,
+      error,
       playVideo,
       playAudio,
-      trackEngagement
+      trackEngagement,
+      onEpisodeProgress,
+      handleTimeUpdate
     };
   }
 });

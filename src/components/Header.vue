@@ -5,12 +5,12 @@
       <div class="logo" @mouseenter="logoHover = true" @mouseleave="logoHover = false">
         <router-link to="/" class="logo-link">
           <div class="logo-container">
-            <img 
-              src="@/assets/images/ReactNowDevLogo.png" 
+          <img 
+            src="@/assets/images/ReactNowDevLogo.png" 
               alt="ReactNowDev Logo" 
               class="logo-image"
-              :class="{ 'hover': logoHover }"
-            />
+            :class="{ 'hover': logoHover }"
+          />
             <transition name="fade">
               <span class="logo-text" v-if="logoHover || isMenuOpen">ReactNowDev</span>
             </transition>
@@ -43,7 +43,7 @@
                 <transition name="rotate-icon" mode="out-in">
                   <MoonIcon v-if="darkMode" key="moon" class="theme-icon" />
                   <SunIcon v-else key="sun" class="theme-icon" />
-                </transition>
+              </transition>
               </div>
             </button>
           </li>

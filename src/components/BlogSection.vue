@@ -11,13 +11,12 @@
           <span>{{ userTokens }} Tokens</span>
         </div>
       </div>
-
       <div class="blog-filters">
         <button 
           v-for="category in categories" 
           :key="category.id"
-          :class="['filter-btn', { active: activeCategory === category.id }]"
-          @click="activeCategory = category.id"
+          :class="['filter-btn', { active: isActiveCategory(category.id) }]"
+          @click="setActiveCategory(category.id)"
         >
           <font-awesome-icon :icon="category.icon" class="filter-icon" />
           {{ category.name }}
@@ -321,12 +320,34 @@
         </div>
       </div>
     </div>
+
+    <!-- Smart Prompt Modal -->
+    <div v-if="showSmartPrompt" class="smart-prompt-modal">
+      <div class="modal-content">
+        <h3>Enjoying this post?</h3>
+        <p v-if="selectedPost">Unlock the rest for just {{ selectedPost.price }} tokens and support the author!</p>
+        <button v-if="selectedPost" @click="purchasePremiumContent(selectedPost)">Unlock Now</button>
+        <button @click="showSmartPrompt = false">Maybe Later</button>
+      </div>
+    </div>
+
+    <!-- Premium Modal -->
+    <div v-if="showPremiumModal" class="premium-modal">
+      <div class="modal-content">
+        <h3>Unlock Premium Content</h3>
+        <p>Use your tokens to unlock this post!</p>
+        <button v-if="selectedPost" @click="purchasePremiumContent(selectedPost)">Unlock</button>
+        <button @click="showPremiumModal = false">Cancel</button>
+        <p v-if="!selectedPost" class="error-message">Error: No post selected.</p>
+      </div>
+    </div>
   </section>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { sanityClient } from '@/lib/sanity';
 import { 
   faCode, 
   faPalette, 
@@ -358,6 +379,42 @@ library.add(
   faCrown,
   faCheckCircle
 );
+
+interface ContentMetrics {
+  averageRating: number;
+  totalRatings: number;
+  helpfulCount: number;
+  engagementScore: number;
+  sentimentAnalysis: {
+    positive: number;
+    negative: number;
+    neutral: number;
+  };
+  qualityScore: number;
+}
+
+interface Comment {
+  id: number;
+  author: {
+    name: string;
+    avatar: string;
+    role: string;
+    reputation: number;
+  };
+  content: string;
+  date: string;
+  upvotes: number;
+  downvotes: number;
+  isVerified: boolean;
+  images?: string[];
+  replies: Comment[];
+  rating?: number;
+  helpful: number;
+  isHelpful?: boolean;
+  isReported?: boolean;
+  sentiment?: 'positive' | 'negative' | 'neutral';
+  tags?: string[];
+}
 
 interface Post {
   id: number;
@@ -393,45 +450,6 @@ interface Post {
   metrics: ContentMetrics;
 }
 
-interface Comment {
-  [x: string]: any;
-  id: number;
-  author: {
-    reputation: any;
-    name: string;
-    avatar: string;
-    role: string;
-  };
-    reputation: number;
-  content: string;
-  date: string;
-  upvotes: number;
-  downvotes: number;
-  isVerified: boolean;
-  images?: string[];
-  replies: Comment[];
-  rating?: number;
-  helpful: number;
-  isHelpful?: boolean;
-  isReported?: boolean;
-  sentiment?: 'positive' | 'negative' | 'neutral';
-  tags?: string[];
-}
-
-
-interface ContentMetrics {
-  averageRating: number;
-  totalRatings: number;
-  helpfulCount: number;
-  engagementScore: number;
-  sentimentAnalysis: {
-    positive: number;
-    negative: number;
-    neutral: number;
-  };
-  qualityScore: number;
-}
-
 interface TokenReward {
   views: number;
   tokens: number;
@@ -444,133 +462,10 @@ interface Category {
   icon: string;
 }
 
-export default defineComponent({
-  name: 'BlogSection',
-  setup() {
-    const posts = ref<Post[]>([
-      {
-        id: 1,
-        title: 'The Future of Web Development: Trends to Watch in 2024',
-        excerpt: 'Explore the latest trends shaping the future of web development, from AI integration to advanced frameworks.',
-        image: 'https://source.unsplash.com/random/800x600?web-development',
-        date: '2024-03-15',
-        readTime: 5,
-        views: 1234,
-        upvotes: 89,
-        downvotes: 5,
-        comments: [
-          {
-            id: 1,
-            author: {
-              name: 'John Doe',
-              avatar: 'https://source.unsplash.com/random/100x100?portrait',
-              role: 'Senior Developer',
-              reputation: 1250
-            },
-            content: 'Great insights! The AI integration part was particularly interesting.',
-            date: '2024-03-16',
-            upvotes: 12,
-            downvotes: 0,
-            isVerified: true,
-            images: ['https://source.unsplash.com/random/400x300?coding'],
-            replies: [],
-            helpful: 15,
-            isHelpful: true,
-            sentiment: 'positive',
-            tags: ['AI', 'Future Tech'],
-            reputation: 1250
-          }
-        ],
-        tags: ['web-dev', 'trends', 'future'],
-        category: {
-          id: 'development',
-          name: 'Development',
-          icon: 'code'
-        },
-        featured: true,
-        isPremium: true,
-        price: 4.99,
-        author: {
-          name: 'George Dralagar',
-          avatar: 'https://source.unsplash.com/random/100x100?portrait',
-          tokens: 1500
-        },
-        engagement: {
-          views: 1234,
-          uniqueVisitors: 890,
-          averageTimeSpent: 4.5,
-          completionRate: 0.75
-        },
-        metrics: {
-          averageRating: 4.8,
-          totalRatings: 156,
-          helpfulCount: 89,
-          engagementScore: 92,
-          sentimentAnalysis: {
-            positive: 85,
-            negative: 5,
-            neutral: 10
-          },
-          qualityScore: 4.9
-        }
-      },
-      {
-        id: 2,
-        title: 'Building Responsive UIs with Modern CSS',
-        excerpt: 'Learn how to create beautiful, responsive user interfaces using modern CSS techniques and best practices.',
-        image: 'https://source.unsplash.com/random/800x600?css',
-        date: '2024-03-10',
-        readTime: 4,
-        views: 856,
-        upvotes: 56,
-        downvotes: 0,
-        comments: [],
-        tags: ['css', 'ui', 'design'],
-        category: {
-          id: 'design',
-          name: 'Design',
-          icon: 'palette'
-        },
-        featured: false,
-        isPremium: false,
-        price: 0,
-        author: {
-          name: 'Jane Smith',
-          avatar: 'https://source.unsplash.com/random/100x100?portrait',
-          tokens: 1000
-        },
-        engagement: {
-          views: 856,
-          uniqueVisitors: 560,
-          averageTimeSpent: 3.5,
-          completionRate: 0.65
-        },
-        metrics: {
-          averageRating: 4.5,
-          totalRatings: 100,
-          helpfulCount: 50,
-          engagementScore: 80,
-          sentimentAnalysis: {
-            positive: 70,
-            negative: 10,
-            neutral: 20
-          },
-          qualityScore: 4.7
-        }
-      },
-      // Add more posts as needed
-    ]);
-
-    const categories = ref<Category[]>([
-      { id: 'all', name: 'All Posts', icon: 'code' },
-      { id: 'development', name: 'Development', icon: 'code' },
-      { id: 'design', name: 'Design', icon: 'palette' },
-      { id: 'mobile', name: 'Mobile', icon: 'mobile-alt' },
-      { id: 'cloud', name: 'Cloud', icon: 'cloud' }
-    ]);
-
+const posts = ref<Post[]>([]);
+const categories = ref<Category[]>([]);
     const activeCategory = ref<string>('all');
-    const isLoading = ref<boolean>(false);
+const isLoading = ref(true);
 
     const filteredPosts = computed<Post[]>(() => {
       if (activeCategory.value === 'all') return posts.value;
@@ -605,30 +500,137 @@ export default defineComponent({
       { views: 5000, tokens: 500, multiplier: 2 }
     ]);
 
-    const userTokens = ref<number>(100);
-    const showPremiumModal = ref<boolean>(false);
-    const selectedPost = ref<Post | null>(null);
-    const newComment = ref<string>('');
-    const newReply = ref<string>('');
+const userTokens = ref(100);
+const showPremiumModal = ref(false);
+const selectedPost = ref(null as Post | null);
+const newComment = ref('');
+const newReply = ref('');
     const uploadedImages = ref<File[]>([]);
-    const showImageModal = ref<boolean>(false);
+const showImageModal = ref(false);
     const selectedImage = ref<string>('');
     const showRatingModal = ref<boolean>(false);
     const selectedRating = ref<number>(0);
     const ratingComment = ref<string>('');
+const prompted = ref<boolean>(false);
+const showSmartPrompt = ref(false);
 
-    const calculateTokens = (views: number): number => {
-      const reward = tokenRewards.value.find(r => views >= r.views);
-      if (!reward) return 0;
-      return Math.floor(views * reward.tokens * reward.multiplier / reward.views);
+const fetchCategories = async () => {
+  try {
+    const query = `*[_type == "category"]{ _id, title, icon }`;
+    const sanityCategories = await sanityClient.fetch(query);
+    categories.value = [
+      { id: 'all', name: 'All Posts', icon: 'code' },
+      ...sanityCategories.map((cat: any) => ({
+        id: cat._id,
+        name: cat.title,
+        icon: cat.icon || 'code'
+      }))
+    ];
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    categories.value = [{ id: 'all', name: 'All Posts', icon: 'code' }];
+  }
+};
+
+const fetchPosts = async () => {
+  try {
+    const query = `*[_type == "blogPost"] | order(publishedAt desc) {
+      _id,
+      title,
+      excerpt,
+      "image": mainImage.asset->url,
+      "date": publishedAt,
+      readTime,
+      tags,
+      "category": categories[0]->{
+        _id,
+        title,
+        icon
+      },
+      featured,
+      isPremium,
+      price,
+      "author": author->{
+        name,
+        "avatar": image.asset->url,
+        tokens
+      },
+      "engagement": {
+        "views": engagement.views,
+        "uniqueVisitors": engagement.uniqueVisitors,
+        "averageTimeSpent": engagement.averageTimeSpent,
+        "completionRate": engagement.completionRate
+      },
+      "metrics": {
+        "averageRating": metrics.averageRating,
+        "totalRatings": metrics.totalRatings,
+        "helpfulCount": metrics.helpfulCount,
+        "engagementScore": metrics.engagementScore,
+        "sentimentAnalysis": metrics.sentimentAnalysis,
+        "qualityScore": metrics.qualityScore
+      }
+    }`;
+
+    const sanityPosts = await sanityClient.fetch(query);
+    posts.value = sanityPosts.map((post: any) => ({
+      id: post._id,
+      title: post.title,
+      excerpt: post.excerpt,
+      image: post.image,
+      date: post.date,
+      readTime: post.readTime,
+      views: post.engagement?.views || 0,
+      upvotes: 0,
+      downvotes: 0,
+      comments: [],
+      tags: post.tags || [],
+      category: {
+        id: post.category?._id || 'uncategorized',
+        name: post.category?.title || 'Uncategorized',
+        icon: post.category?.icon || 'code'
+      },
+      featured: post.featured || false,
+      isPremium: post.isPremium || false,
+      price: post.price || 0,
+      author: {
+        name: post.author?.name || 'Unknown',
+        avatar: post.author?.avatar || '',
+        tokens: post.author?.tokens || 0
+      },
+      engagement: post.engagement || {
+        views: 0,
+        uniqueVisitors: 0,
+        averageTimeSpent: 0,
+        completionRate: 0
+      },
+      metrics: post.metrics || {
+        averageRating: 0,
+        totalRatings: 0,
+        helpfulCount: 0,
+        engagementScore: 0,
+        sentimentAnalysis: { positive: 0, negative: 0, neutral: 0 },
+        qualityScore: 0
+      }
+    }));
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    posts.value = [];
+  } finally {
+    isLoading.value = false;
+  }
     };
 
     const upvotePost = (postId: number): void => {
       const post = posts.value.find(p => p.id === postId);
       if (post) {
         post.upvotes++;
-        // Award tokens for upvoting
-        userTokens.value += 5;
+    // Calculate dynamic token reward based on views
+    const reward = tokenRewards.value.find(r => post.engagement.views >= r.views);
+    if (reward) {
+      userTokens.value += reward.tokens * reward.multiplier;
+    } else {
+      userTokens.value += 5; // Default reward
+    }
       }
     };
 
@@ -690,16 +692,6 @@ export default defineComponent({
       }
     };
 
-    const trackEngagement = (postId: number): void => {
-      const post = posts.value.find(p => p.id === postId);
-      if (post) {
-        post.engagement.views++;
-        // Award tokens based on engagement
-        const tokens = calculateTokens(post.engagement.views);
-        post.author.tokens += tokens;
-      }
-    };
-
     const addComment = async (postId: number, content: string, images: string[] = []): Promise<void> => {
       if (!content.trim()) return;
       
@@ -708,7 +700,7 @@ export default defineComponent({
         // Simulate API call for sentiment analysis
         const sentiment = await analyzeSentiment();
         
-        const newComment: Comment = {
+    const comment: Comment = {
           id: Date.now(),
           author: {
             name: 'Current User',
@@ -725,14 +717,13 @@ export default defineComponent({
           replies: [],
           helpful: 0,
           sentiment,
-          tags: extractTags(content),
-          reputation: 100
+      tags: extractTags(content)
         };
 
-        post.comments.push(newComment);
+    post.comments.push(comment);
         // Award tokens for commenting
         userTokens.value += 2;
-        newComment.value = ''; // Clear the input
+    newComment.value = ''; // <-- fix: clear the ref, not a local variable
       }
     };
 
@@ -783,7 +774,7 @@ export default defineComponent({
       if (post) {
         const comment = post.comments.find(c => c.id === commentId);
         if (comment) {
-          const newReply: Comment = {
+      const reply: Comment = {
             id: Date.now(),
             author: {
               name: 'Current User',
@@ -800,14 +791,13 @@ export default defineComponent({
             replies: [],
             helpful: 0,
             sentiment: 'neutral',
-            tags: [],
-            reputation: 100
+        tags: []
           };
 
-          comment.replies.push(newReply);
+      comment.replies.push(reply);
           // Award tokens for replying
           userTokens.value += 1;
-          newReply.value = ''; // Clear the input
+      newReply.value = ''; // <-- fix: clear the ref, not a local variable
         }
       }
     };
@@ -865,54 +855,35 @@ export default defineComponent({
 
       // Convert to 1-5 star rating
       return Math.round(qualityScore * 4) + 1;
-    };
+} // Ensure this closing bracket is properly aligned with the opening bracket of the function
 
-    const getStarRating = (post: Post): number => {
+const getStarRating = (post: any): number => { // Change 'Post' to 'any' to fix the type error
       return calculateContentQuality(post);
     };
 
-    return {
-      posts,
-      categories,
-      activeCategory,
-      isLoading,
-      filteredPosts,
-      formatDate,
-      viewPost,
-      loadMorePosts,
-      userTokens,
-      showPremiumModal,
-      selectedPost,
-      upvotePost,
-      upvoteComment,
-      downvoteComment,
-      markHelpful,
-      reportComment,
-      purchasePremiumContent,
-      trackEngagement,
-      newComment,
-      newReply,
-      uploadedImages,
-      showImageModal,
-      selectedImage,
-      showRatingModal,
-      selectedRating,
-      ratingComment,
-      calculateTokens,
-      addComment,
-      extractTags,
-      analyzeSentiment,
-      openImageModal,
-      closeImageModal,
-      handleImageUpload,
-      addReply,
-      submitRating,
-      closeRatingModal,
-      ratePost,
-      calculateContentQuality,
-      getStarRating
-    };
-  }
+// Dynamic price calculation based on upvotes
+
+// Smart prompt: show purchase modal at 70% scroll or after 30 seconds
+
+const isActiveCategory = (categoryId: string): boolean => {
+  return activeCategory.value === categoryId;
+};
+
+const setActiveCategory = (categoryId: string): void => {
+  activeCategory.value = categoryId;
+};
+
+onMounted(() => {
+  fetchCategories();
+  fetchPosts();
+  window.addEventListener('scroll', () => {
+    if (prompted.value) return;
+    const scrollPercent = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+    if (scrollPercent > 0.7 && selectedPost.value?.isPremium) {
+      showSmartPrompt.value = true;
+      prompted.value = true;
+    }
+  });
 });
 </script>
 
@@ -1577,6 +1548,102 @@ export default defineComponent({
 
 .quality-rating .fa-star.active {
   color: #ffd700;
+}
+
+.smart-prompt-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90vh;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.modal-content h3 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.modal-content p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.modal-content button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: #00f7ff;
+  color: #16213e;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 0 0.5rem;
+}
+
+.modal-content button:hover {
+  background: #00ff9d;
+}
+
+.premium-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90vh;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.modal-content h3 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.modal-content p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.modal-content button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: #00f7ff;
+  color: #16213e;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 0 0.5rem;
+}
+
+.modal-content button:hover {
+  background: #00ff9d;
 }
 
 @media (max-width: 768px) {

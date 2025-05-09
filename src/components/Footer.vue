@@ -1,7 +1,7 @@
 <template>
   <footer class="footer">
     <!-- Animated wave decoration -->
-    <div class="footer-wave"></div>
+      <div class="footer-wave"></div>
     
     <div class="footer-container">
       <!-- Main footer content sections -->
@@ -15,8 +15,8 @@
           <div class="tech-stack">
             <span 
               v-for="tech in techStack" 
-              :key="tech.name"
-              class="tech-badge"
+                  :key="tech.name" 
+                  class="tech-badge"
               :style="{ backgroundColor: tech.color }"
             >
               <font-awesome-icon :icon="tech.icon" class="tech-icon" />
@@ -37,11 +37,11 @@
                 :class="{ 'active': $route.path === link.path }"
               >
                 <router-link :to="link.path" class="nav-link">
-                  <font-awesome-icon :icon="link.icon" class="link-icon" />
-                  {{ link.name }}
-                </router-link>
-              </li>
-            </ul>
+                <font-awesome-icon :icon="link.icon" class="link-icon" />
+                {{ link.name }}
+              </router-link>
+            </li>
+          </ul>
           </nav>
         </section>
 
@@ -51,8 +51,8 @@
           <address class="contact-info">
             <div 
               v-for="contact in contactInfo" 
-              :key="contact.type"
-              class="contact-item"
+                 :key="contact.type" 
+                 class="contact-item"
               @click="handleContact(contact)"
             >
               <font-awesome-icon :icon="contact.icon" class="contact-icon" />
@@ -102,13 +102,13 @@
       <div class="social-links" data-aos="fade-up" data-aos-delay="400">
         <a
           v-for="social in socialLinks"
-          :key="social.platform"
-          :href="social.url"
+           :key="social.platform"
+           :href="social.url"
           :aria-label="social.name"
           target="_blank"
           rel="noopener noreferrer"
           class="social-link"
-          :class="social.platform"
+           :class="social.platform"
         >
           <font-awesome-icon :icon="['fab', social.icon]" />
         </a>
@@ -121,7 +121,7 @@
         </p>
         <button
           @click="scrollToTop"
-          class="back-to-top"
+                class="back-to-top" 
           :class="{ 'visible': showBackToTop }"
           aria-label="Scroll to top"
         >
@@ -160,38 +160,38 @@ const subscriptionSuccess = ref(false)
 const showBackToTop = ref(false)
 
 // Data
-const techStack = [
-  { name: 'Vue', icon: 'vuejs', color: '#42b883' },
-  { name: 'React', icon: 'react', color: '#61dafb' },
-  { name: 'Node.js', icon: 'node-js', color: '#339933' }
+    const techStack = [
+      { name: 'Vue', icon: 'vuejs', color: '#42b883' },
+      { name: 'React', icon: 'react', color: '#61dafb' },
+      { name: 'Node.js', icon: 'node-js', color: '#339933' }
 ]
 
-const quickLinks = [
-  { name: 'Projects', path: '/projects', icon: 'code' },
-  { name: 'Blog', path: '/blog', icon: 'blog' },
-  { name: 'Contact', path: '/contact', icon: 'envelope' }
+    const quickLinks = [
+      { name: 'Projects', path: '/projects', icon: 'code' },
+      { name: 'Blog', path: '/blog', icon: 'blog' },
+      { name: 'Contact', path: '/contact', icon: 'envelope' }
 ]
 
-const contactInfo = [
-  { type: 'email', value: 'gdralagar@gmail.com', icon: 'envelope' },
-  { type: 'location', value: 'Nairobi, Kenya', icon: 'map-marker-alt' }
+    const contactInfo = [
+      { type: 'email', value: 'gdralagar@gmail.com', icon: 'envelope' },
+      { type: 'location', value: 'Nairobi, Kenya', icon: 'map-marker-alt' }
 ]
 
-const socialLinks = [
-  { platform: 'github', name: 'GitHub', icon: 'github', url: 'https://github.com/Dralagar' },
-  { platform: 'linkedin', name: 'LinkedIn', icon: 'linkedin', url: 'https://linkedin.com/in/george-dralagar' },
-  { platform: 'twitter', name: 'Twitter', icon: 'twitter', url: 'https://twitter.com/your-handle' },
-  { platform: 'instagram', name: 'Instagram', icon: 'instagram', url: 'https://instagram.com/your-handle' }
+    const socialLinks = [
+      { platform: 'github', name: 'GitHub', icon: 'github', url: 'https://github.com/Dralagar' },
+      { platform: 'linkedin', name: 'LinkedIn', icon: 'linkedin', url: 'https://linkedin.com/in/george-dralagar' },
+      { platform: 'twitter', name: 'Twitter', icon: 'twitter', url: 'https://twitter.com/your-handle' },
+      { platform: 'instagram', name: 'Instagram', icon: 'instagram', url: 'https://instagram.com/your-handle' }
 ]
 
 // Computed
-const isValidEmail = computed(() => {
+    const isValidEmail = computed(() => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return re.test(email.value)
 })
 
 // Methods
-const validateEmail = () => {
+    const validateEmail = () => {
   if (!email.value) {
     emailError.value = ''
     return
@@ -222,7 +222,7 @@ const handleContact = (contact) => {
   }
 }
 
-const scrollToTop = () => {
+    const scrollToTop = () => {
   window.scrollTo({
     top: 0,
     behavior: 'smooth'
@@ -234,11 +234,11 @@ const handleScroll = () => {
 }
 
 // Lifecycle hooks
-onMounted(() => {
+    onMounted(() => {
   window.addEventListener('scroll', handleScroll)
 })
 
-onUnmounted(() => {
+    onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
 })
 </script>
@@ -633,13 +633,13 @@ onUnmounted(() => {
   .footer-section {
     padding: 1.25rem;
   }
-  
+
   .footer-bottom {
     flex-direction: column;
     gap: 1rem;
     text-align: center;
   }
-  
+
   .back-to-top {
     position: static;
     margin-top: 1rem;

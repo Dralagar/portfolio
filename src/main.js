@@ -3,6 +3,7 @@ import './assets/base.css';
 import 'aos/dist/aos.css'
 import AOS from 'aos'
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { 
   faCode, 
   faBlog, 
@@ -12,6 +13,7 @@ import {
 
 import { createApp } from 'vue'
 import App from './App.vue'
+import router from './router'
 
 // Initialize AOS
 AOS.init({
@@ -27,4 +29,4 @@ library.add(
   faEnvelope
 );
 
-createApp(App).mount('#app')
+createApp(App).component('font-awesome-icon', FontAwesomeIcon).mount('#app')
