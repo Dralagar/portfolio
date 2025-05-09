@@ -1,22 +1,24 @@
 <template>
   <div class="contact-page">
-    <h1>Contact</h1>
-    <div class="contact-form">
-      <!-- Your contact form will go here -->
-    </div>
+    <ContactSection />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import ContactSection from '@/components/ContactSection.vue';
 
 export default defineComponent({
-  name: 'ContactView'
+  name: 'ContactView',
+  components: {
+    ContactSection
+  }
 });
 </script>
 
 <style scoped>
 .contact-page {
-  padding: 4rem 2rem;
+  min-height: 100vh;
+  padding-top: 80px; /* Account for fixed header */
 }
 </style> 

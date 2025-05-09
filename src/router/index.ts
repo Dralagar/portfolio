@@ -34,20 +34,11 @@ const router = createRouter({
       return savedPosition;
     }
     
-    // Handle hash links (e.g., #blog, #podcast)
     if (to.hash) {
       return {
         el: to.hash,
         behavior: 'smooth',
-        top: 80 // Adjust based on your header height
-      };
-    }
-
-    // For specific routes, scroll to top with offset
-    if (to.path === '/blog' || to.path === '/podcast') {
-      return {
-        top: 80, // Add offset to account for fixed header
-        behavior: 'smooth'
+        top: 80
       };
     }
 

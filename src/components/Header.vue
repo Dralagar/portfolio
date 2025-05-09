@@ -74,17 +74,18 @@ import { MoonIcon, SunIcon } from "@heroicons/vue/24/solid";
 export default defineComponent({
   name: "HeaderSection",
   components: { MoonIcon, SunIcon },
-  setup() {
+  emits: ['toggleDarkMode'],
+  setup(_, { emit }) {
     const isMenuOpen = ref(false);
     const isScrolled = ref(false);
     const logoHover = ref(false);
     const darkMode = ref(false);
     
     const navLinks = [
-      { text: "About", path: "/#about" },
+      { text: "Home", path: "/" },
       { text: "Projects", path: "/#projects" },
-      { text: "Podcasts", path: "/podcast" },
-      { text: "Blog", path: "/blog" },
+      { text: "Podcasts", path: "/#podcast" },
+      { text: "Blog", path: "/#blog" },
       { text: "Contact", path: "/#contact" }
     ];
 
@@ -118,6 +119,7 @@ export default defineComponent({
       darkMode.value = !darkMode.value;
       localStorage.setItem('theme', darkMode.value ? 'dark' : 'light');
       applyTheme();
+      emit('toggleDarkMode', darkMode.value);
     };
 
     const applyTheme = () => {

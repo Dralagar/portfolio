@@ -1,22 +1,24 @@
 <template>
   <div class="projects-page">
-    <h1>Projects</h1>
-    <div class="projects-grid">
-      <!-- Your projects content will go here -->
-    </div>
+    <ProjectsSection />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import ProjectsSection from '@/components/ProjectsSection.vue';
 
 export default defineComponent({
-  name: 'ProjectsView'
+  name: 'ProjectsView',
+  components: {
+    ProjectsSection
+  }
 });
 </script>
 
 <style scoped>
 .projects-page {
-  padding: 4rem 2rem;
+  min-height: 100vh;
+  padding-top: 80px; /* Account for fixed header */
 }
 </style> 

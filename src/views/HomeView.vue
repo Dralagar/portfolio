@@ -4,13 +4,13 @@
     <AboutSection id="about" />
     <ProjectsSection id="projects" />
     <BlogSection id="blog" />
-    <PodcastSection id="podcast" />
+    <PodcastSection id="podcast" :episodes="[]" />
     <ContactSection id="contact" />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import HeroSection from '@/components/HeroSection.vue';
 import AboutSection from '@/components/AboutSection.vue';
 import ProjectsSection from '@/components/ProjectsSection.vue';
@@ -27,6 +27,18 @@ export default defineComponent({
     BlogSection,
     PodcastSection,
     ContactSection
+  },
+  setup() {
+    onMounted(() => {
+      // Handle hash navigation on mount
+      const hash = window.location.hash;
+      if (hash) {
+        const element = document.querySelector(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    });
   }
 });
 </script>
@@ -34,6 +46,7 @@ export default defineComponent({
 <style scoped>
 .home {
   min-height: 100vh;
+  scroll-behavior: smooth;
 }
 
 section {
